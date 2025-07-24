@@ -1,282 +1,253 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
-import UserCard from '../components/UI/UserCard';
-import UserForm from '../components/UI/UserForm';
-import LoadingSpinner from '../components/UI/LoadingSpinner';
-import { apiService } from '../services/apiService';
+import { motion } from 'framer-motion';
+import { User } from '@types';
+import { generateId } from '@utils';
 
 const UsersContainer = styled.div`
-  padding: 100px 2rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
 `;
 
-const PageHeader = styled.div`
-  text-align: center;
-  margin-bottom: 3rem;
-`;
-
-const PageTitle = styled(motion.h1)`
-  font-size: 3rem;
-  font-weight: 800;
-  background: ${({ theme }) => theme.gradients.primary};
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 1rem;
-`;
-
-const PageSubtitle = styled(motion.p)`
-  font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 3rem;
-  margin-bottom: 3rem;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-`;
-
-const FormSection = styled(motion.section)`
+const Content = styled(motion.div)`
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  border-radius: ${props => props.theme.borderRadius.lg};
   padding: 2rem;
-  height: fit-content;
+  margin-bottom: 2rem;
 `;
 
-const UsersSection = styled(motion.section)`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  padding: 2rem;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 1.5rem;
+const Header = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-`;
-
-const UsersGrid = styled.div`
-  display: grid;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
   gap: 1rem;
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+const Title = styled.h2`
+  color: ${props => props.theme.colors.text};
+  margin: 0;
 `;
 
-const ErrorMessage = styled(motion.div)`
-  background: rgba(245, 101, 101, 0.1);
-  border: 1px solid rgba(245, 101, 101, 0.3);
-  color: ${({ theme }) => theme.colors.error};
-  padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  margin-bottom: 1rem;
-`;
-
-const SuccessMessage = styled(motion.div)`
-  background: rgba(72, 187, 120, 0.1);
-  border: 1px solid rgba(72, 187, 120, 0.3);
-  color: ${({ theme }) => theme.colors.success};
-  padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  margin-bottom: 1rem;
-`;
-
-const RefreshButton = styled(motion.button)`
-  background: ${({ theme }) => theme.gradients.primary};
-  color: white;
-  border: none;
+const AddButton = styled(motion.button)`
   padding: 0.75rem 1.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background: ${props => props.theme.gradients.primary};
+  border: none;
+  border-radius: ${props => props.theme.borderRadius.md};
+  color: white;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.glow};
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 `;
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  created_at?: string;
-}
+const UserGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+`;
 
-const UsersPage: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+const UserCard = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: ${props => props.theme.borderRadius.md};
+  padding: 1.5rem;
+  transition: all 0.3s ease;
 
-  const loadUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiService.getUsers();
-      setUsers(response.data || []);
-    } catch (err) {
-      setError('Failed to load users. Please make sure the server is running.');
-      console.error('Error loading users:', err);
-    } finally {
-      setLoading(false);
+  &:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+  }
+`;
+
+const UserAvatar = styled.div`
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: ${props => props.theme.gradients.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 1rem;
+`;
+
+const UserName = styled.h3`
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+`;
+
+const UserEmail = styled.p`
+  color: ${props => props.theme.colors.textSecondary};
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+`;
+
+const UserRole = styled.span<{ role: string }>`
+  padding: 0.25rem 0.75rem;
+  border-radius: ${props => props.theme.borderRadius.sm};
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: ${props => {
+    switch (props.role) {
+      case 'admin': return 'rgba(239, 68, 68, 0.2)';
+      case 'moderator': return 'rgba(245, 158, 11, 0.2)';
+      default: return 'rgba(16, 185, 129, 0.2)';
     }
+  }};
+  color: ${props => {
+    switch (props.role) {
+      case 'admin': return '#ef4444';
+      case 'moderator': return '#f59e0b';
+      default: return '#10b981';
+    }
+  }};
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 4rem 2rem;
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 4rem;
+  margin-bottom: 1rem;
+`;
+
+// Mock users data
+const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    role: 'admin',
+    createdAt: '2024-01-15T10:30:00Z',
+    updatedAt: '2024-01-15T10:30:00Z',
+    isActive: true,
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+    role: 'moderator',
+    createdAt: '2024-01-16T14:20:00Z',
+    updatedAt: '2024-01-16T14:20:00Z',
+    isActive: true,
+  },
+  {
+    id: '3',
+    name: 'Bob Johnson',
+    email: 'bob.johnson@example.com',
+    role: 'user',
+    createdAt: '2024-01-17T09:15:00Z',
+    updatedAt: '2024-01-17T09:15:00Z',
+    isActive: true,
+  },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.3,
+    },
+  },
+};
+
+export const UsersPage: React.FC = () => {
+  const [users, setUsers] = useState<User[]>(mockUsers);
+
+  const handleAddUser = () => {
+    const newUser: User = {
+      id: generateId(),
+      name: `User ${users.length + 1}`,
+      email: `user${users.length + 1}@example.com`,
+      role: 'user',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isActive: true,
+    };
+    setUsers([...users, newUser]);
   };
 
-  const handleUserCreated = (newUser: User) => {
-    setUsers(prev => [...prev, newUser]);
-    setSuccess('User created successfully!');
-    setTimeout(() => setSuccess(null), 3000);
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
-
-  const handleUserUpdated = (updatedUser: User) => {
-    setUsers(prev => prev.map(user => 
-      user.id === updatedUser.id ? updatedUser : user
-    ));
-    setSuccess('User updated successfully!');
-    setTimeout(() => setSuccess(null), 3000);
-  };
-
-  const handleUserDeleted = (userId: number) => {
-    setUsers(prev => prev.filter(user => user.id !== userId));
-    setSuccess('User deleted successfully!');
-    setTimeout(() => setSuccess(null), 3000);
-  };
-
-  useEffect(() => {
-    loadUsers();
-  }, []);
 
   return (
     <UsersContainer>
-      <PageHeader>
-        <PageTitle
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          User Management
-        </PageTitle>
-        <PageSubtitle
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          Manage your users with our intuitive interface. Add, edit, and delete users
-          with real-time updates and beautiful animations.
-        </PageSubtitle>
-      </PageHeader>
-
-      <AnimatePresence>
-        {error && (
-          <ErrorMessage
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+      <Content
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Header>
+          <Title>👥 User Management</Title>
+          <AddButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleAddUser}
           >
-            {error}
-          </ErrorMessage>
-        )}
-        {success && (
-          <SuccessMessage
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            + Add User
+          </AddButton>
+        </Header>
+
+        {users.length === 0 ? (
+          <EmptyState>
+            <EmptyIcon>👤</EmptyIcon>
+            <h3>No users found</h3>
+            <p>Get started by adding your first user.</p>
+          </EmptyState>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
           >
-            {success}
-          </SuccessMessage>
+            <UserGrid>
+              {users.map((user) => (
+                <UserCard
+                  key={user.id}
+                  variants={cardVariants}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <UserAvatar>
+                    {getInitials(user.name)}
+                  </UserAvatar>
+                  <UserName>{user.name}</UserName>
+                  <UserEmail>{user.email}</UserEmail>
+                  <UserRole role={user.role}>
+                    {user.role.toUpperCase()}
+                  </UserRole>
+                </UserCard>
+              ))}
+            </UserGrid>
+          </motion.div>
         )}
-      </AnimatePresence>
-
-      <ContentGrid>
-        <FormSection
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <SectionTitle>
-            ➕ Add New User
-          </SectionTitle>
-          <UserForm onUserCreated={handleUserCreated} />
-        </FormSection>
-
-        <UsersSection
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <SectionTitle>
-              👥 Users List ({users.length})
-            </SectionTitle>
-            <RefreshButton
-              onClick={loadUsers}
-              disabled={loading}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              🔄 Refresh
-            </RefreshButton>
-          </div>
-
-          {loading ? (
-            <LoadingSpinner />
-          ) : users.length === 0 ? (
-            <EmptyState>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👤</div>
-              <p>No users found. Add your first user to get started!</p>
-            </EmptyState>
-          ) : (
-            <UsersGrid>
-              <AnimatePresence>
-                {users.map((user, index) => (
-                  <UserCard
-                    key={user.id}
-                    user={user}
-                    index={index}
-                    onUserUpdated={handleUserUpdated}
-                    onUserDeleted={handleUserDeleted}
-                  />
-                ))}
-              </AnimatePresence>
-            </UsersGrid>
-          )}
-        </UsersSection>
-      </ContentGrid>
+      </Content>
     </UsersContainer>
   );
 };
-
-export default UsersPage;
