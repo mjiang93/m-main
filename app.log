@@ -1,0 +1,23 @@
+2025-07-24 09:50:58,055 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.11.47:5000
+2025-07-24 09:50:58,056 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-24 09:50:58,058 - werkzeug - INFO -  * Restarting with stat
+2025-07-24 09:50:58,258 - werkzeug - WARNING -  * Debugger is active!
+2025-07-24 09:50:58,260 - werkzeug - INFO -  * Debugger PIN: 593-510-281
+2025-07-24 09:51:25,004 - utils.decorators - INFO - API Request: GET /api/users
+2025-07-24 09:51:25,006 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 09:51:25] "GET /api/users HTTP/1.1" 200 -
+2025-07-24 09:51:25,044 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 09:51:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-24 10:13:33,713 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:13:33] "GET /health HTTP/1.1" 200 -
+2025-07-24 10:31:21,715 - utils.decorators - INFO - API Request: GET /api/users
+2025-07-24 10:31:21,715 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:31:21] "GET /api/users HTTP/1.1" 200 -
+2025-07-24 10:31:28,450 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:31:28] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-24 10:31:31,177 - utils.decorators - INFO - API Request: GET /api/users
+2025-07-24 10:31:31,178 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:31:31] "GET /api/users HTTP/1.1" 200 -
+2025-07-24 10:31:31,494 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:31:31] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-24 10:31:34,924 - utils.decorators - INFO - API Request: GET /api/users
+2025-07-24 10:31:34,924 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:31:34] "GET /api/users HTTP/1.1" 200 -
+2025-07-24 10:31:34,949 - werkzeug - INFO - 127.0.0.1 - - [24/Jul/2025 10:31:34] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-24 10:40:18,528 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Administrator\\codebuddy\\test1\\test_api.py', reloading
+2025-07-24 10:40:18,596 - werkzeug - INFO -  * Restarting with stat
