@@ -1,129 +1,7 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { User } from '@types';
 import { generateId } from '@utils';
-
-const UsersContainer = styled.div`
-  width: 100%;
-`;
-
-const Content = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: 2rem;
-  margin-bottom: 2rem;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h2`
-  color: ${props => props.theme.colors.text};
-  margin: 0;
-`;
-
-const AddButton = styled(motion.button)`
-  padding: 0.75rem 1.5rem;
-  background: ${props => props.theme.gradients.primary};
-  border: none;
-  border-radius: ${props => props.theme.borderRadius.md};
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  }
-`;
-
-const UserGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-`;
-
-const UserCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
-  }
-`;
-
-const UserAvatar = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: ${props => props.theme.gradients.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 1rem;
-`;
-
-const UserName = styled.h3`
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-`;
-
-const UserEmail = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
-`;
-
-const UserRole = styled.span<{ role: string }>`
-  padding: 0.25rem 0.75rem;
-  border-radius: ${props => props.theme.borderRadius.sm};
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: ${props => {
-    switch (props.role) {
-      case 'admin': return 'rgba(239, 68, 68, 0.2)';
-      case 'moderator': return 'rgba(245, 158, 11, 0.2)';
-      default: return 'rgba(16, 185, 129, 0.2)';
-    }
-  }};
-  color: ${props => {
-    switch (props.role) {
-      case 'admin': return '#ef4444';
-      case 'moderator': return '#f59e0b';
-      default: return '#10b981';
-    }
-  }};
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 4rem 2rem;
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const EmptyIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 1rem;
-`;
 
 // Mock users data
 const mockUsers: User[] = [
@@ -193,61 +71,122 @@ export const UsersPage: React.FC = () => {
     setUsers([...users, newUser]);
   };
 
+  const handleRemoveUser = (userId: string) => {
+    setUsers(users.filter(user => user.id !== userId));
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
+  const getRoleClass = (role: string) => {
+    switch (role) {
+      case 'admin': return 'user-role admin';
+      case 'moderator': return 'user-role moderator';
+      default: return 'user-role user';
+    }
+  };
+
   return (
-    <UsersContainer>
-      <Content
+    <div className="w-full">
+      <motion.main
+        className="content-section"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Header>
-          <Title>👥 User Management</Title>
-          <AddButton
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+          <h2 className="text-3xl font-bold text-white m-0">👥 User Management</h2>
+          <motion.button
+            className="btn btn-primary"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleAddUser}
           >
             + Add User
-          </AddButton>
-        </Header>
+          </motion.button>
+        </div>
 
+        {/* Users Grid or Empty State */}
         {users.length === 0 ? (
-          <EmptyState>
-            <EmptyIcon>👤</EmptyIcon>
-            <h3>No users found</h3>
+          <div className="text-center py-16 px-8 text-gray-400">
+            <div className="text-6xl mb-4">👤</div>
+            <h3 className="text-xl font-semibold mb-2 text-white">No users found</h3>
             <p>Get started by adding your first user.</p>
-          </EmptyState>
+          </div>
         ) : (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            <UserGrid>
+            <div className="user-grid">
               {users.map((user) => (
-                <UserCard
+                <motion.div
                   key={user.id}
+                  className="user-card group"
                   variants={cardVariants}
                   whileHover={{ scale: 1.02 }}
+                  layout
                 >
-                  <UserAvatar>
+                  <div className="user-avatar">
                     {getInitials(user.name)}
-                  </UserAvatar>
-                  <UserName>{user.name}</UserName>
-                  <UserEmail>{user.email}</UserEmail>
-                  <UserRole role={user.role}>
-                    {user.role.toUpperCase()}
-                  </UserRole>
-                </UserCard>
+                  </div>
+                  <h3 className="user-name">{user.name}</h3>
+                  <p className="user-email">{user.email}</p>
+                  <div className="flex justify-between items-center">
+                    <span className={getRoleClass(user.role)}>
+                      {user.role.toUpperCase()}
+                    </span>
+                    <motion.button
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      className="px-3 py-1 bg-red-500/20 text-red-400 rounded-md text-sm font-medium hover:bg-red-500/30 transition-colors"
+                      onClick={() => handleRemoveUser(user.id)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      Remove
+                    </motion.button>
+                  </div>
+                </motion.div>
               ))}
-            </UserGrid>
+            </div>
           </motion.div>
         )}
-      </Content>
-    </UsersContainer>
+
+        {/* Statistics */}
+        {users.length > 0 && (
+          <motion.div
+            className="mt-12 p-6 glass rounded-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 className="text-xl font-semibold text-white mb-4">📊 User Statistics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold gradient-text mb-2">
+                  {users.length}
+                </div>
+                <div className="text-gray-300">Total Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold gradient-text mb-2">
+                  {users.filter(u => u.role === 'admin').length}
+                </div>
+                <div className="text-gray-300">Administrators</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold gradient-text mb-2">
+                  {users.filter(u => u.isActive).length}
+                </div>
+                <div className="text-gray-300">Active Users</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </motion.main>
+    </div>
   );
 };

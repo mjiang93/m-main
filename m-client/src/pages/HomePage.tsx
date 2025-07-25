@@ -1,67 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import Hero3D from '@components/3D/Hero3D';
 import SimpleAnimatedStats from '@components/UI/SimpleAnimatedStats';
-
-const HomeContainer = styled.div`
-  width: 100%;
-`;
-
-const HeroSection = styled(motion.div)`
-  height: 400px;
-  margin: 4rem 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Content = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: 2rem;
-  margin-bottom: 2rem;
-`;
-
-const FeatureGrid = styled(motion.div)`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin: 2rem 0;
-`;
-
-const FeatureCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: 2rem;
-  text-align: center;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const CardIcon = styled.div`
-  font-size: 3rem;
-  margin-bottom: 1rem;
-`;
-
-const CardTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: ${props => props.theme.colors.text};
-`;
-
-const CardDescription = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  line-height: 1.6;
-`;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -113,24 +53,28 @@ const features = [
   },
   {
     icon: '🚀',
-    title: 'Production Ready',
-    description: 'Configured with ESLint, TypeScript strict mode, and build optimizations.',
+    title: 'Modern CSS',
+    description: 'Latest CSS technologies with Tailwind CSS atomic framework and modern features.',
   },
 ];
 
 export const HomePage: React.FC = () => {
   return (
-    <HomeContainer>
-      <HeroSection
+    <div className="w-full">
+      {/* Hero Section with 3D Animation */}
+      <motion.div
+        className="h-96 my-16 relative flex items-center justify-center"
         variants={itemVariants}
         initial="hidden"
         animate="visible"
         transition={{ delay: 0.3 }}
       >
         <Hero3D />
-      </HeroSection>
+      </motion.div>
 
-      <Content
+      {/* Main Content */}
+      <motion.main
+        className="content-section"
         variants={itemVariants}
         initial="hidden"
         animate="visible"
@@ -143,14 +87,20 @@ export const HomePage: React.FC = () => {
         >
           <motion.h2 
             variants={itemVariants}
-            style={{ marginBottom: '2rem', textAlign: 'center' }}
+            className="text-3xl font-bold text-center mb-8 gradient-text"
           >
             🏠 Welcome to Enhanced M-Client
           </motion.h2>
-          <FeatureGrid variants={containerVariants}>
+          
+          {/* Feature Grid */}
+          <motion.div 
+            className="feature-grid animate-stagger"
+            variants={containerVariants}
+          >
             {features.map((feature, index) => (
-              <FeatureCard
+              <motion.div
                 key={index}
+                className="feature-card group"
                 variants={itemVariants}
                 whileHover={{ 
                   scale: 1.05,
@@ -158,21 +108,24 @@ export const HomePage: React.FC = () => {
                   transition: { duration: 0.3 }
                 }}
               >
-                <CardIcon>{feature.icon}</CardIcon>
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription>{feature.description}</CardDescription>
-              </FeatureCard>
+                <div className="card-icon group-hover:animate-bounce">
+                  {feature.icon}
+                </div>
+                <h3 className="card-title">{feature.title}</h3>
+                <p className="card-description">{feature.description}</p>
+              </motion.div>
             ))}
-          </FeatureGrid>
+          </motion.div>
           
+          {/* Animated Statistics */}
           <motion.div
             variants={itemVariants}
-            style={{ marginTop: '3rem' }}
+            className="mt-12"
           >
             <SimpleAnimatedStats />
           </motion.div>
         </motion.div>
-      </Content>
-    </HomeContainer>
+      </motion.main>
+    </div>
   );
 };

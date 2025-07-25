@@ -1,54 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
-
-const StatsContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-`;
-
-const StatCard = styled(motion.div)`
-  text-align: center;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
-  }
-`;
-
-const StatNumber = styled(motion.div)`
-  font-size: 3rem;
-  font-weight: 800;
-  background: ${({ theme }) => theme.gradients.primary};
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.5rem;
-`;
-
-const StatLabel = styled.h3`
-  font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
-
-const StatDescription = styled.p`
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-size: 0.9rem;
-`;
 
 interface AnimatedNumberProps {
   end: number;
@@ -84,9 +35,9 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   }, [hasAnimated, end, duration]);
 
   return (
-    <StatNumber>
+    <div className="text-5xl font-extrabold gradient-text mb-2">
       {count.toLocaleString()}{suffix}
-    </StatNumber>
+    </div>
   );
 };
 
@@ -96,71 +47,90 @@ const stats = [
     suffix: '+',
     label: 'Active Users',
     description: 'Growing community of satisfied users',
+    icon: '👥',
   },
   {
     number: 99,
     suffix: '%',
     label: 'Uptime',
     description: 'Reliable and stable performance',
+    icon: '⚡',
   },
   {
     number: 50,
     suffix: '+',
     label: 'Features',
     description: 'Comprehensive functionality suite',
+    icon: '🚀',
   },
   {
     number: 24,
     suffix: '/7',
     label: 'Support',
     description: 'Round-the-clock assistance',
+    icon: '🛠️',
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut',
+    },
+  },
+};
+
 const SimpleAnimatedStats: React.FC = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: 'easeOut',
-      },
-    },
-  };
-
   return (
-    <StatsContainer>
+    <div className="max-w-6xl mx-auto px-8">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <StatsGrid>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
-            <StatCard key={index} variants={cardVariants}>
+            <motion.div
+              key={index}
+              className="card text-center group"
+              variants={cardVariants}
+              whileHover={{ 
+                scale: 1.05,
+                transition: { duration: 0.3 }
+              }}
+            >
+              <div className="text-4xl mb-4 group-hover:animate-bounce">
+                {stat.icon}
+              </div>
               <AnimatedNumber 
                 end={stat.number} 
                 suffix={stat.suffix}
               />
-              <StatLabel>{stat.label}</StatLabel>
-              <StatDescription>{stat.description}</StatDescription>
-            </StatCard>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {stat.label}
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                {stat.description}
+              </p>
+            </motion.div>
           ))}
-        </StatsGrid>
+        </div>
       </motion.div>
-    </StatsContainer>
+    </div>
   );
 };
 

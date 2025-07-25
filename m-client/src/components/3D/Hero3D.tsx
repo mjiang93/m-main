@@ -1,110 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import styled, { keyframes, css } from 'styled-components';
-
-const float = keyframes`
-  0%, 100% { 
-    transform: translateY(0px) rotate(0deg); 
-  }
-  50% { 
-    transform: translateY(-20px) rotate(180deg); 
-  }
-`;
-
-const pulse = keyframes`
-  0%, 100% { 
-    opacity: 1; 
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.7; 
-    transform: scale(1.05);
-  }
-`;
-
-const rotate = keyframes`
-  from { 
-    transform: rotate(0deg); 
-  }
-  to { 
-    transform: rotate(360deg); 
-  }
-`;
-
-const HeroContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-`;
-
-const AnimatedSphere = styled.div`
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
-  ${css`
-    animation: ${float} 6s ease-in-out infinite;
-  `}
-  box-shadow: 
-    0 0 50px rgba(102, 126, 234, 0.4),
-    inset 0 0 50px rgba(255, 255, 255, 0.1);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    width: 30%;
-    height: 30%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    ${css`
-      animation: ${pulse} 4s ease-in-out infinite;
-    `}
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    border: 2px solid rgba(102, 126, 234, 0.2);
-    border-radius: 50%;
-    ${css`
-      animation: ${rotate} 20s linear infinite;
-    `}
-  }
-
-  @media (max-width: 768px) {
-    width: 150px;
-    height: 150px;
-  }
-`;
-
-const ParticleContainer = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-`;
-
-const Particle = styled.div<{ delay: number; duration: number; size: number }>`
-  position: absolute;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  background: rgba(102, 126, 234, 0.6);
-  border-radius: 50%;
-  ${props => css`
-    animation: ${float} ${props.duration}s ease-in-out infinite;
-    animation-delay: ${props.delay}s;
-  `}
-`;
 
 const Hero3D: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,32 +11,35 @@ const Hero3D: React.FC = () => {
     const particles: HTMLDivElement[] = [];
     const particleCount = 20;
 
-    // Add keyframes to document head
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes floatParticle {
-        0%, 100% { 
-          transform: translateY(0px) rotate(0deg); 
+    // Add keyframes to document head if not already present
+    if (!document.querySelector('#hero-3d-styles')) {
+      const style = document.createElement('style');
+      style.id = 'hero-3d-styles';
+      style.textContent = `
+        @keyframes floatParticle {
+          0%, 100% { 
+            transform: translateY(0px) rotate(0deg); 
+          }
+          50% { 
+            transform: translateY(-20px) rotate(180deg); 
+          }
         }
-        50% { 
-          transform: translateY(-20px) rotate(180deg); 
-        }
-      }
-    `;
-    document.head.appendChild(style);
+      `;
+      document.head.appendChild(style);
+    }
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
-      particle.style.position = 'absolute';
-      particle.style.width = Math.random() * 4 + 2 + 'px';
-      particle.style.height = particle.style.width;
+      const size = Math.random() * 4 + 2;
+      
+      particle.className = 'absolute rounded-full pointer-events-none';
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
       particle.style.background = 'rgba(102, 126, 234, 0.6)';
-      particle.style.borderRadius = '50%';
       particle.style.left = Math.random() * 100 + '%';
       particle.style.top = Math.random() * 100 + '%';
       particle.style.animation = `floatParticle ${Math.random() * 3 + 3}s ease-in-out infinite`;
       particle.style.animationDelay = Math.random() * 2 + 's';
-      particle.style.pointerEvents = 'none';
       
       container.appendChild(particle);
       particles.push(particle);
@@ -154,30 +51,41 @@ const Hero3D: React.FC = () => {
           container.removeChild(particle);
         }
       });
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
     };
   }, []);
 
   return (
-    <HeroContainer ref={containerRef}>
-      <ParticleContainer>
+    <div className="hero-3d" ref={containerRef}>
+      {/* Particle Container */}
+      <div className="absolute inset-0 pointer-events-none">
         {Array.from({ length: 8 }, (_, i) => (
-          <Particle
+          <div
             key={i}
-            delay={i * 0.5}
-            duration={4 + Math.random() * 2}
-            size={2 + Math.random() * 3}
+            className="particle absolute rounded-full bg-primary-500/60"
             style={{
+              width: `${2 + Math.random() * 3}px`,
+              height: `${2 + Math.random() * 3}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-            }}
+              animationDelay: `${i * 0.5}s`,
+              animationDuration: `${4 + Math.random() * 2}s`,
+              '--duration': `${4 + Math.random() * 2}s`,
+              '--delay': `${i * 0.5}s`,
+            } as React.CSSProperties}
           />
         ))}
-      </ParticleContainer>
-      <AnimatedSphere />
-    </HeroContainer>
+      </div>
+      
+      {/* Main Animated Sphere */}
+      <div className="animated-sphere">
+        {/* Inner glow effect */}
+        <div className="absolute top-1/5 left-1/5 w-3/10 h-3/10 rounded-full bg-white/30 animate-pulse-slow"></div>
+        
+        {/* Outer ring */}
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full border-2 border-primary-500/20 rounded-full animate-spin-slow"
+             style={{ width: '200%', height: '200%' }}></div>
+      </div>
+    </div>
   );
 };
 

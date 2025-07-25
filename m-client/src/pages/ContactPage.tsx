@@ -1,167 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { motion } from 'framer-motion';
-
-const ContactContainer = styled.div`
-  width: 100%;
-`;
-
-const Content = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: 2rem;
-  margin-bottom: 2rem;
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 3rem;
-`;
-
-const Title = styled.h2`
-  color: ${props => props.theme.colors.text};
-  margin-bottom: 1rem;
-  font-size: 2.5rem;
-`;
-
-const Subtitle = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: 1.1rem;
-  line-height: 1.6;
-`;
-
-const ContactGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-`;
-
-const ContactCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: 2rem;
-  text-align: center;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
-  }
-`;
-
-const ContactIcon = styled.div`
-  font-size: 3rem;
-  margin-bottom: 1rem;
-`;
-
-const ContactTitle = styled.h3`
-  color: ${props => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-`;
-
-const ContactInfo = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  margin-bottom: 1rem;
-`;
-
-const ContactForm = styled.form`
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
-const Label = styled.label`
-  display: block;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.sm};
-  color: ${props => props.theme.colors.text};
-  font-size: 1rem;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &::placeholder {
-    color: ${props => props.theme.colors.textSecondary};
-  }
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: ${props => props.theme.borderRadius.sm};
-  color: ${props => props.theme.colors.text};
-  font-size: 1rem;
-  min-height: 120px;
-  resize: vertical;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &::placeholder {
-    color: ${props => props.theme.colors.textSecondary};
-  }
-`;
-
-const SubmitButton = styled(motion.button)`
-  width: 100%;
-  padding: 1rem;
-  background: ${props => props.theme.gradients.primary};
-  border: none;
-  border-radius: ${props => props.theme.borderRadius.md};
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const SuccessMessage = styled(motion.div)`
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: 1rem;
-  text-align: center;
-  color: #10b981;
-  margin-top: 1rem;
-`;
 
 const contactInfo = [
   {
@@ -239,121 +77,146 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <ContactContainer>
-      <Content
+    <div className="w-full">
+      <motion.main
+        className="content-section"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Header>
-          <Title>📞 Get in Touch</Title>
-          <Subtitle>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-white mb-4">📞 Get in Touch</h2>
+          <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto">
             Have questions about M-Client? We'd love to hear from you. 
             Send us a message and we'll respond as soon as possible.
-          </Subtitle>
-        </Header>
+          </p>
+        </div>
 
+        {/* Contact Information Cards */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
+          className="contact-grid"
         >
-          <ContactGrid>
-            {contactInfo.map((contact, index) => (
-              <ContactCard
-                key={index}
-                variants={cardVariants}
-                whileHover={{ scale: 1.02 }}
-              >
-                <ContactIcon>{contact.icon}</ContactIcon>
-                <ContactTitle>{contact.title}</ContactTitle>
-                <ContactInfo>{contact.info}</ContactInfo>
-                <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>
-                  {contact.description}
-                </p>
-              </ContactCard>
-            ))}
-          </ContactGrid>
+          {contactInfo.map((contact, index) => (
+            <motion.div
+              key={index}
+              className="card text-center group"
+              variants={cardVariants}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="text-5xl mb-4 group-hover:animate-bounce">
+                {contact.icon}
+              </div>
+              <h3 className="text-white text-xl font-semibold mb-2">
+                {contact.title}
+              </h3>
+              <p className="text-gray-300 mb-4 font-medium">
+                {contact.info}
+              </p>
+              <p className="text-gray-400 text-sm">
+                {contact.description}
+              </p>
+            </motion.div>
+          ))}
         </motion.div>
 
+        {/* Contact Form */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-12"
         >
-          <ContactForm onSubmit={handleSubmit}>
-            <FormGroup>
-              <Label htmlFor="name">Name *</Label>
-              <Input
+          <form onSubmit={handleSubmit} className="contact-form">
+            <div className="form-group">
+              <label htmlFor="name" className="form-label">Name *</label>
+              <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Your full name"
+                className="form-input"
                 required
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label htmlFor="email">Email *</Label>
-              <Input
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">Email *</label>
+              <input
                 type="email"
                 id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="your.email@example.com"
+                className="form-input"
                 required
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label htmlFor="subject">Subject *</Label>
-              <Input
+            <div className="form-group">
+              <label htmlFor="subject" className="form-label">Subject *</label>
+              <input
                 type="text"
                 id="subject"
                 name="subject"
                 value={formData.subject}
                 onChange={handleInputChange}
                 placeholder="What is this about?"
+                className="form-input"
                 required
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label htmlFor="message">Message *</Label>
-              <TextArea
+            <div className="form-group">
+              <label htmlFor="message" className="form-label">Message *</label>
+              <textarea
                 id="message"
                 name="message"
                 value={formData.message}
                 onChange={handleInputChange}
                 placeholder="Tell us more about your inquiry..."
+                className="form-textarea"
                 required
               />
-            </FormGroup>
+            </div>
 
-            <SubmitButton
+            <motion.button
               type="submit"
               disabled={isSubmitting}
+              className="form-button"
               whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
               whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
-            </SubmitButton>
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="loading-spinner"></div>
+                  Sending...
+                </span>
+              ) : (
+                'Send Message'
+              )}
+            </motion.button>
 
+            {/* Success Message */}
             {isSubmitted && (
-              <SuccessMessage
+              <motion.div
+                className="success-message mt-4 text-center"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
               >
                 ✅ Thank you! Your message has been sent successfully.
-              </SuccessMessage>
+              </motion.div>
             )}
-          </ContactForm>
+          </form>
         </motion.div>
-      </Content>
-    </ContactContainer>
+      </motion.main>
+    </div>
   );
 };
